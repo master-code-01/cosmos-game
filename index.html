@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Космический Полет: Новая Эра</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            color: #fff;
+        }
+        
+        #game-container {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            box-shadow: 0 0 30px rgba(0, 200, 255, 0.5);
+            border: 2px solid #00eeff;
+            overflow: hidden;
+        }
+        
+        #game-canvas {
+            background-color: #000;
+            display: block;
+        }
+        
+        #ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        .ui-panel {
+            background: rgba(0, 20, 40, 0.7);
+            padding: 8px 15px;
+            border: 2px solid #00aaff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
+            font-size: 16px;
+        }
+        
+        #start-screen, #game-over, #upgrade-screen, #achievements-screen, #pause-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 10, 30, 0.9);
+            z-index: 10;
+        }
+        
+        #game-over, #upgrade-screen, #achievements-screen, #pause-screen {
+            display: none;
+        }
+        
+        h1 {
+            font-size: 36px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px #00eeff, 0 0 20px #0088ff;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+        
+        h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px #ff00aa, 0 0 20px #ff0066;
+            text-align: center;
+        }
+        
+        p {
+            font-size: 16px;
+            margin: 8px 0;
+            text-align: center;
+            max-width: 80%;
+            line-height: 1.5;
+        }
+        
+        .highlight {
+            color: #00eeff;
+            font-weight: bold;
+        }
+        
+        .upgrade-highlight {
+            color: #ffcc00;
+            font-weight: bold;
+        }
+        
+        button {
+            background: linear-gradient(to bottom, #00aaff, #0066cc);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 16px;
+            font-family: 'Courier New', monospace;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 50px;
+            box-shadow: 0 0 15px rgba(0, 170, 255, 0.7);
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: linear-gradient(to bottom, #00ccff, #0088ff);
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 200, 255, 0.9);
+        }
+        
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .key {
+            background: rgba(0, 50, 100, 0.7);
+            border: 2px solid #00aaff;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            min-width: 35px;
+            text-align: center;
+            font-size: 14px;
+        }
+        
+        .final-score {
+            font-size: 22px;
+            margin: 15px 0;
+            color: #ffcc00;
+        }
+        
+        .upgrade-options {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .upgrade-option {
+            background: rgba(0, 30, 60, 0.8);
+            border: 2px solid #00aaff;
+            border-radius: 10px;
+            padding: 12px;
+            width: 170px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .upgrade-option:hover {
+            background: rgba(0, 60, 120, 0.9);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 170, 255, 0.5);
+        }
+        
+        .powerup, .obstacle {
+            position: absolute;
+            border-radius: 50%;
+            z-index: 2;
+        }
+        
+        .health-bar {
+            width: 150px;
+            height: 15px;
+            background: #333;
+            border: 2px solid #00aaff;
+            border-radius: 10px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        
+        .health-fill {
+            height: 100%;
+            background: linear-gradient(to right, #ff3300, #00cc00);
+            width: 100%;
+            transition: width 0.3s;
+        }
+        
+        .level-indicator {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 20, 40, 0.7);
+            padding: 6px 15px;
+            border: 2px solid #ffcc00;
+            border-radius: 20px;
+            font-size: 16px;
+            z-index: 5;
+        }
+        
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+            max-width: 90%;
+        }
+        
+        .achievement {
+            background: rgba(0, 30, 60, 0.8);
+            border: 2px solid #00aaff;
+            border-radius: 10px;
+            padding: 12px;
+            min-width: 180px;
+            text-align: center;
+        }
+        
+        .achievement.unlocked {
+            border-color: #ffcc00;
+            background: rgba(50, 30, 0, 0.8);
+        }
+        
+        .achievement-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        
+        .achievement-name {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .achievement-desc {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .screen-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .enemy-health {
+            position: absolute;
+            width: 100%;
+            height: 5px;
+            background: #333;
+        }
+        
+        .enemy-health-fill {
+            height: 100%;
+            background: #ff3300;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas" width="800" height="600"></canvas>
+        
+        <div class="stars" id="stars"></div>
+        
+        <div id="ui-overlay">
+            <div class="ui-panel">
+                <div>СЧЕТ: <span id="score">0</span></div>
+            </div>
+            <div class="ui-panel">
+                <div>ЖИЗНИ: <span id="lives">3</span></div>
+                <div class="health-bar">
+                    <div class="health-fill" id="health-fill"></div>
+                </div>
+            </div>
+            <div class="ui-panel">
+                <div>УРОВЕНЬ: <span id="level">1</span></div>
+                <div>СПЕЦ: <span id="special-attacks">0</span></div>
+            </div>
+        </div>
+        
+        <div id="start-screen">
+            <h1>КОСМИЧЕСКИЙ ПОЛЕТ</h1>
+            <p>Управляйте своей <span class="highlight">ракетой</span>, уничтожайте врагов и преодолевайте препятствия!</p>
+            
+            <div class="controls">
+                <div class="key">← →</div>
+                <div>ДВИЖЕНИЕ</div>
+                <div class="key">ПРОБЕЛ</div>
+                <div>СТРЕЛЬБА</div>
+                <div class="key">SHIFT</div>
+                <div>СПЕЦ. АТАКА</div>
+                <div class="key">P</div>
+                <div>ПАУЗА</div>
+            </div>
+            
+            <button id="start-button">НАЧАТЬ ИГРУ</button>
+            <button id="achievements-button">ДОСТИЖЕНИЯ</button>
+        </div>
+        
+        <div id="game-over">
+            <h2>ИГРА ОКОНЧЕНА</h2>
+            <div class="final-score">Ваш счет: <span id="final-score">0</span></div>
+            <p>Вы проявили себя как настоящий космический пилот!</p>
+            <div class="screen-buttons">
+                <button id="restart-button">ИГРАТЬ СНОВА</button>
+                <button id="menu-button">ГЛАВНОЕ МЕНЮ</button>
+            </div>
+        </div>
+        
+        <div id="upgrade-screen">
+            <h2>АПГРЕЙД РАКЕТЫ!</h2>
+            <p>Выберите улучшение для вашей ракеты:</p>
+            
+            <div class="upgrade-options">
+                <div class="upgrade-option" data-upgrade="firepower">
+                    <div class="upgrade-icon">🔥</div>
+                    <h3>СИЛА ОГНЯ</h3>
+                    <p>Увеличивает урон ваших пуль</p>
+                </div>
+                <div class="upgrade-option" data-upgrade="speed">
+                    <div class="upgrade-icon">⚡</div>
+                    <h3>СКОРОСТЬ</h3>
+                    <p>Увеличивает скорость движения</p>
+                </div>
+                <div class="upgrade-option" data-upgrade="shield">
+                    <div class="upgrade-icon">🛡️</div>
+                    <h3>ЩИТ</h3>
+                    <p>Добавляет дополнительную защиту</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="achievements-screen">
+            <h2>ДОСТИЖЕНИЯ</h2>
+            <div class="achievements-grid" id="achievements-grid">
+                <!-- Достижения будут добавлены здесь -->
+            </div>
+            <button id="back-button">НАЗАД</button>
+        </div>
+        
+        <div id="pause-screen">
+            <h2>ПАУЗА</h2>
+            <p>Игра приостановлена</p>
+            <div class="screen-buttons">
+                <button id="resume-button">ПРОДОЛЖИТЬ</button>
+                <button id="menu-pause-button">ГЛАВНОЕ МЕНЮ</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Инициализация canvas
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+        const livesElement = document.getElementById('lives');
+        const finalScoreElement = document.getElementById('final-score');
+        const startScreen = document.getElementById('start-screen');
+        const gameOverScreen = document.getElementById('game-over');
+        const upgradeScreen = document.getElementById('upgrade-screen');
+        const achievementsScreen = document.getElementById('achievements-screen');
+        const pauseScreen = document.getElementById('pause-screen');
+        const startButton = document.getElementById('start-button');
+        const restartButton = document.getElementById('restart-button');
+        const menuButton = document.getElementById('menu-button');
+        const menuPauseButton = document.getElementById('menu-pause-button');
+        const achievementsButton = document.getElementById('achievements-button');
+        const backButton = document.getElementById('back-button');
+        const resumeButton = document.getElementById('resume-button');
+        const levelElement = document.getElementById('level');
+        const healthFill = document.getElementById('health-fill');
+        const specialAttacksElement = document.getElementById('special-attacks');
+        const achievementsGrid = document.getElementById('achievements-grid');
+        const starsContainer = document.getElementById('stars');
+        
+        // Создание звездного фона
+        function createStars() {
+            starsContainer.innerHTML = '';
+            for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.style.width = `${Math.random() * 3}px`;
+                star.style.height = star.style.width;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.opacity = Math.random();
+                star.style.animation = `twinkle ${Math.random() * 3 + 2}s infinite`;
+                starsContainer.appendChild(star);
+            }
+        }
+        
+        // Добавим анимацию мерцания звезд
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes twinkle {
+                0% { opacity: 0.2; }
+                50% { opacity: 1; }
+                100% { opacity: 0.2; }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Система достижений
+        const achievements = [
+            { id: 'first_blood', name: 'Первая кровь', desc: 'Уничтожьте первого врага', icon: '🎯', unlocked: false },
+            { id: 'destroyer', name: 'Уничтожитель', desc: 'Уничтожьте 50 врагов', icon: '💥', unlocked: false },
+            { id: 'survivor', name: 'Выживший', desc: 'Достигните уровня 5', icon: '🏆', unlocked: false },
+            { id: 'shield_master', name: 'Мастер щита', desc: 'Получите 3 уровня щита', icon: '🛡️', unlocked: false },
+            { id: 'firepower', name: 'Сила огня', desc: 'Получите 3 уровня огня', icon: '🔥', unlocked: false },
+            { id: 'speed_demon', name: 'Скоростной демон', desc: 'Получите 3 уровня скорости', icon: '⚡', unlocked: false },
+            { id: 'specialist', name: 'Специалист', desc: 'Используйте 5 специальных атак', icon: '☄️', unlocked: false },
+            { id: 'pacifist', name: 'Пацифист', desc: 'Завершите уровень без уничтожения врагов', icon: '☮️', unlocked: false }
+        ];
+        
+        // Отображение достижений
+        function renderAchievements() {
+            achievementsGrid.innerHTML = '';
+            achievements.forEach(achievement => {
+                const div = document.createElement('div');
+                div.className = `achievement ${achievement.unlocked ? 'unlocked' : ''}`;
+                div.innerHTML = `
+                    <div class="achievement-icon">${achievement.icon}</div>
+                    <div class="achievement-name">${achievement.name}</div>
+                    <div class="achievement-desc">${achievement.desc}</div>
+                `;
+                achievementsGrid.appendChild(div);
+            });
+        }
+        
+        // Проверка достижений
+        function checkAchievements() {
+            if (enemiesDestroyed >= 1 && !achievements[0].unlocked) {
+                achievements[0].unlocked = true;
+                renderAchievements();
+            }
+            
+            if (enemiesDestroyed >= 50 && !achievements[1].unlocked) {
+                achievements[1].unlocked = true;
+                renderAchievements();
+            }
+            
+            if (level >= 5 && !achievements[2].unlocked) {
+                achievements[2].unlocked = true;
+                renderAchievements();
+            }
+            
+            if (player.shield >= 3 && !achievements[3].unlocked) {
+                achievements[3].unlocked = true;
+                renderAchievements();
+            }
+            
+            if (player.firepower >= 3 && !achievements[4].unlocked) {
+                achievements[4].unlocked = true;
+                renderAchievements();
+            }
+            
+            if (player.speed >= 8 && !achievements[5].unlocked) {
+                achievements[5].unlocked = true;
+                renderAchievements();
+            }
+            
+            if (specialAttacksUsed >= 5 && !achievements[6].unlocked) {
+                achievements[6].unlocked = true;
+                renderAchievements();
+            }
+        }
+        
+        // Игровые переменные
+        let gameRunning = false;
+        let gamePaused = false;
+        let score = 0;
+        let lives = 3;
+        let health = 100;
+        let player = {
+            x: canvas.width / 2 - 25,
+            y: canvas.height - 100,
+            width: 50,
+            height: 80,
+            speed: 5,
+            color: '#00eeff',
+            firepower: 1,
+            shield: 0,
+            specialAttack: 0
+        };
+        
+        let bullets = [];
+        let enemies = [];
+        let particles = [];
+        let powerups = [];
+        let obstacles = [];
+        let keys = {};
+        let enemySpawnTimer = 0;
+        let enemySpawnInterval = 60; // кадры
+        let backgroundOffset = 0;
+        let level = 1;
+        let nextUpgradeScore = 100;
+        let specialAttackCooldown = 0;
+        let specialAttacksUsed = 0;
+        let enemiesDestroyed = 0;
+        let obstacleSpawnTimer = 0;
+        let obstacleSpawnInterval = 300; // кадры
+        
+        // Типы врагов
+        const enemyTypes = [
+            { color: '#ff3366', size: 30, speed: 2, points: 10, health: 1 },
+            { color: '#33ccff', size: 40, speed: 1.5, points: 15, health: 2 },
+            { color: '#ffcc00', size: 25, speed: 3, points: 20, health: 1 },
+            { color: '#9933ff', size: 50, speed: 1, points: 30, health: 3 } // Сильный враг
+        ];
+        
+        // Типы препятствий
+        const obstacleTypes = [
+            { color: '#666666', size: 40, speed: 2 },
+            { color: '#888888', size: 60, speed: 1.5 },
+            { color: '#aaaaaa', size: 30, speed: 2.5 }
+        ];
+        
+        // Создание врага
+        function createEnemy() {
+            // С увеличением уровня появляются более сильные враги
+            let typeIndex = 0;
+            if (level >= 3) typeIndex = Math.min(Math.floor(Math.random() * 2) + 1, enemyTypes.length - 1);
+            if (level >= 5) typeIndex = Math.min(Math.floor(Math.random() * 3) + 1, enemyTypes.length - 1);
+            if (level >= 7) typeIndex = Math.min(Math.floor(Math.random() * 4), enemyTypes.length - 1);
+            
+            const type = enemyTypes[typeIndex];
+            const size = type.size;
+            const enemy = {
+                x: Math.random() * (canvas.width - size),
+                y: -size,
+                width: size,
+                height: size,
+                speed: type.speed + (level * 0.1),
+                color: type.color,
+                points: type.points,
+                health: type.health,
+                maxHealth: type.health,
+                type: type
+            };
+            enemies.push(enemy);
+        }
+        
+        // Создание препятствия
+        function createObstacle() {
+            const type = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
+            const size = type.size;
+            const obstacle = {
+                x: Math.random() * (canvas.width - size),
+                y: -size,
+                width: size,
+                height: size,
+                speed: type.speed + (level * 0.1),
+                color: type.color,
+                type: type
+            };
+            obstacles.push(obstacle);
+        }
+        
+        // Создание пули
+        function createBullet() {
+            const bulletCount = player.firepower;
+            const spread = 10;
+            
+            for (let i = 0; i < bulletCount; i++) {
+                bullets.push({
+                    x: player.x + player.width / 2 - 3,
+                    y: player.y,
+                    width: 6,
+                    height: 15,
+                    speed: 10,
+                    color: '#ffcc00',
+                    offsetX: (i - (bulletCount - 1) / 2) * spread,
+                    damage: 1
+                });
+            }
+        }
+        
+        // Создание специальной атаки
+        function createSpecialAttack() {
+            for (let i = 0; i < 15 + level; i++) {
+                bullets.push({
+                    x: Math.random() * canvas.width,
+                    y: canvas.height,
+                    width: 8,
+                    height: 20,
+                    speed: -15,
+                    color: '#ff3300',
+                    special: true,
+                    damage: 2
+                });
+            }
+            player.specialAttack--;
+            specialAttacksUsed++;
+            specialAttacksElement.textContent = player.specialAttack;
+            checkAchievements();
+        }
+        
+        // Создание бонуса
+        function createPowerup() {
+            if (Math.random() < 0.3) { // 30% шанс
+                powerups.push({
+                    x: Math.random() * (canvas.width - 25),
+                    y: -25,
+                    width: 25,
+                    height: 25,
+                    speed: 2,
+                    type: Math.random() < 0.5 ? 'health' : 'special'
+                });
+            }
+        }
+        
+        // Создание частиц взрыва
+        function createExplosion(x, y, color) {
+            for (let i = 0; i < 20; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    radius: Math.random() * 3 + 1,
+                    color: color,
+                    speed: Math.random() * 5 + 2,
+                    angle: Math.random() * Math.PI * 2,
+                    life: 30
+                });
+            }
+        }
+        
+        // Проверка столкновений
+        function checkCollision(obj1, obj2) {
+            return obj1.x < obj2.x + obj2.width &&
+                   obj1.x + obj1.width > obj2.x &&
+                   obj1.y < obj2.y + obj2.height &&
+                   obj1.y + obj1.height > obj2.y;
+        }
+        
+        // Показать экран апгрейда
+        function showUpgradeScreen() {
+            gameRunning = false;
+            upgradeScreen.style.display = 'flex';
+        }
+        
+        // Применить апгрейд
+        function applyUpgrade(upgradeType) {
+            switch(upgradeType) {
+                case 'firepower':
+                    player.firepower = Math.min(player.firepower + 1, 3);
+                    break;
+                case 'speed':
+                    player.speed = Math.min(player.speed + 1, 8);
+                    break;
+                case 'shield':
+                    player.shield = Math.min(player.shield + 1, 3);
+                    break;
+            }
+            
+            levelElement.textContent = level;
+            specialAttacksElement.textContent = player.specialAttack;
+            upgradeScreen.style.display = 'none';
+            gameRunning = true;
+            gameLoop();
+        }
+        
+        // Пауза игры
+        function togglePause() {
+            if (!gameRunning) return;
+            
+            gamePaused = !gamePaused;
+            if (gamePaused) {
+                pauseScreen.style.display = 'flex';
+            } else {
+                pauseScreen.style.display = 'none';
+                gameLoop();
+            }
+        }
+        
+        // Обновление игры
+        function update() {
+            if (!gameRunning || gamePaused) return;
+            
+            // Движение игрока
+            if (keys['ArrowLeft'] && player.x > 0) {
+                player.x -= player.speed;
+            }
+            if (keys['ArrowRight'] && player.x < canvas.width - player.width) {
+                player.x += player.speed;
+            }
+            
+            // Стрельба
+            if (keys[' '] && bullets.length < 15) {
+                createBullet();
+                keys[' '] = false; // Предотвращаем непрерывную стрельбу
+            }
+            
+            // Специальная атака
+            if (keys['Shift'] && player.specialAttack > 0 && specialAttackCooldown <= 0) {
+                createSpecialAttack();
+                specialAttackCooldown = 300; // 5 секунд при 60 FPS
+                keys['Shift'] = false;
+            }
+            
+            // Пауза
+            if (keys['p'] || keys['P']) {
+                togglePause();
+                keys['p'] = false;
+                keys['P'] = false;
+            }
+            
+            // Обновление таймера специальной атаки
+            if (specialAttackCooldown > 0) {
+                specialAttackCooldown--;
+            }
+            
+            // Обновление пуль
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                if (bullets[i].special) {
+                    bullets[i].y += bullets[i].speed;
+                } else {
+                    bullets[i].y -= bullets[i].speed;
+                    bullets[i].x += bullets[i].offsetX * 0.1;
+                }
+                
+                // Удаление пуль за пределами экрана
+                if (bullets[i].y + bullets[i].height < 0 || bullets[i].y > canvas.height) {
+                    bullets.splice(i, 1);
+                    continue;
+                }
+                
+                // Проверка попаданий по врагам
+                for (let j = enemies.length - 1; j >= 0; j--) {
+                    if (checkCollision(bullets[i], enemies[j])) {
+                        enemies[j].health -= bullets[i].damage;
+                        
+                        if (enemies[j].health <= 0) {
+                            createExplosion(enemies[j].x + enemies[j].width/2, 
+                                           enemies[j].y + enemies[j].height/2, 
+                                           enemies[j].color);
+                            enemies.splice(j, 1);
+                            score += 10;
+                            enemiesDestroyed++;
+                            scoreElement.textContent = score;
+                            
+                            // Создание бонуса
+                            createPowerup();
+                        }
+                        
+                        bullets.splice(i, 1);
+                        break;
+                    }
+                }
+                
+                // Проверка попаданий по препятствиям
+                for (let j = obstacles.length - 1; j >= 0; j--) {
+                    if (checkCollision(bullets[i], obstacles[j])) {
+                        // Препятствия нельзя уничтожить, но пуля исчезает
+                        bullets.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+            
+            // Создание врагов
+            enemySpawnTimer++;
+            if (enemySpawnTimer >= enemySpawnInterval) {
+                createEnemy();
+                enemySpawnTimer = 0;
+                
+                // Увеличиваем сложность со временем
+                if (enemySpawnInterval > 20) {
+                    enemySpawnInterval -= 0.1;
+                }
+            }
+            
+            // Создание препятствий (начинаем с уровня 3)
+            if (level >= 3) {
+                obstacleSpawnTimer++;
+                if (obstacleSpawnTimer >= obstacleSpawnInterval) {
+                    createObstacle();
+                    obstacleSpawnTimer = 0;
+                }
+            }
+            
+            // Обновление врагов
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                enemies[i].y += enemies[i].speed;
+                
+                // Удаление врагов за пределами экрана
+                if (enemies[i].y > canvas.height) {
+                    enemies.splice(i, 1);
+                    continue;
+                }
+                
+                // Проверка столкновений с игроком
+                if (checkCollision(player, enemies[i])) {
+                    createExplosion(enemies[i].x + enemies[i].width/2, 
+                                   enemies[i].y + enemies[i].height/2, 
+                                   enemies[i].color);
+                    enemies.splice(i, 1);
+                    
+                    // Урон с учетом щита
+                    if (player.shield > 0) {
+                        player.shield--;
+                    } else {
+                        health -= 20;
+                        healthFill.style.width = health + '%';
+                        
+                        if (health <= 0) {
+                            lives--;
+                            livesElement.textContent = lives;
+                            health = 100;
+                            healthFill.style.width = '100%';
+                            
+                            if (lives <= 0) {
+                                gameOver();
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Обновление препятствий
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].y += obstacles[i].speed;
+                
+                // Удаление препятствий за пределами экрана
+                if (obstacles[i].y > canvas.height) {
+                    obstacles.splice(i, 1);
+                    continue;
+                }
+                
+                // Проверка столкновений с игроком
+                if (checkCollision(player, obstacles[i])) {
+                    // Урон с учетом щита
+                    if (player.shield > 0) {
+                        player.shield--;
+                    } else {
+                        health -= 30;
+                        healthFill.style.width = health + '%';
+                        
+                        if (health <= 0) {
+                            lives--;
+                            livesElement.textContent = lives;
+                            health = 100;
+                            healthFill.style.width = '100%';
+                            
+                            if (lives <= 0) {
+                                gameOver();
+                            }
+                        }
+                    }
+                    
+                    // Удаляем препятствие после столкновения
+                    obstacles.splice(i, 1);
+                }
+            }
+            
+            // Обновление бонусов
+            for (let i = powerups.length - 1; i >= 0; i--) {
+                powerups[i].y += powerups[i].speed;
+                
+                // Удаление бонусов за пределами экрана
+                if (powerups[i].y > canvas.height) {
+                    powerups.splice(i, 1);
+                    continue;
+                }
+                
+                // Проверка столкновений с игроком
+                if (checkCollision(player, powerups[i])) {
+                    if (powerups[i].type === 'health') {
+                        health = Math.min(health + 30, 100);
+                        healthFill.style.width = health + '%';
+                    } else if (powerups[i].type === 'special') {
+                        player.specialAttack = Math.min(player.specialAttack + 1, 5);
+                        specialAttacksElement.textContent = player.specialAttack;
+                    }
+                    
+                    powerups.splice(i, 1);
+                }
+            }
+            
+            // Обновление частиц
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].x += Math.cos(particles[i].angle) * particles[i].speed;
+                particles[i].y += Math.sin(particles[i].angle) * particles[i].speed;
+                particles[i].life--;
+                
+                if (particles[i].life <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+            
+            // Анимация фона
+            backgroundOffset = (backgroundOffset + 1) % 20;
+            
+            // Проверка на апгрейд
+            if (score >= nextUpgradeScore) {
+                nextUpgradeScore += 100;
+                level++;
+                levelElement.textContent = level;
+                showUpgradeScreen();
+                
+                // Увеличиваем сложность с каждым уровнем
+                if (level % 2 === 0) {
+                    enemySpawnInterval = Math.max(enemySpawnInterval - 5, 20);
+                }
+                
+                checkAchievements();
+            }
+        }
+        
+        // Отрисовка игры
+        function draw() {
+            // Очистка canvas
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Рисование звездного фона
+            ctx.fillStyle = '#fff';
+            for (let i = 0; i < 100; i++) {
+                const x = (i * 13) % canvas.width;
+                const y = (i * 7 + backgroundOffset) % canvas.height;
+                ctx.fillRect(x, y, 1, 1);
+            }
+            
+            // Рисование игрока (ракеты)
+            ctx.fillStyle = player.color;
+            // Корпус ракеты
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            // Крылья
+            ctx.fillRect(player.x - 10, player.y + 20, 10, 30);
+            ctx.fillRect(player.x + player.width, player.y + 20, 10, 30);
+            // Двигатель
+            ctx.fillStyle = '#ff3300';
+            ctx.fillRect(player.x + 10, player.y + player.height, 10, 20);
+            ctx.fillRect(player.x + 30, player.y + player.height, 10, 20);
+            // Огонь двигателя
+            ctx.fillStyle = '#ffaa00';
+            ctx.beginPath();
+            ctx.moveTo(player.x + 10, player.y + player.height + 20);
+            ctx.lineTo(player.x + 15, player.y + player.height + 35);
+            ctx.lineTo(player.x + 20, player.y + player.height + 20);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(player.x + 30, player.y + player.height + 20);
+            ctx.lineTo(player.x + 35, player.y + player.height + 35);
+            ctx.lineTo(player.x + 40, player.y + player.height + 20);
+            ctx.fill();
+            
+            // Рисование щита
+            if (player.shield > 0) {
+                ctx.strokeStyle = `rgba(0, 200, 255, ${0.3 + player.shield * 0.2})`;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(player.x + player.width/2, player.y + player.height/2, 
+                        player.width/2 + 10, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            // Рисование пуль
+            for (const bullet of bullets) {
+                ctx.fillStyle = bullet.color;
+                ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+                // Эффект свечения
+                ctx.fillStyle = 'rgba(255, 204, 0, 0.5)';
+                ctx.fillRect(bullet.x - 2, bullet.y - 2, bullet.width + 4, bullet.height + 4);
+                ctx.fillStyle = bullet.color;
+            }
+            
+            // Рисование врагов
+            for (const enemy of enemies) {
+                ctx.fillStyle = enemy.color;
+                ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
+                // Детали врага
+                ctx.fillStyle = '#000';
+                ctx.fillRect(enemy.x + 5, enemy.y + 5, enemy.width - 10, enemy.height - 10);
+                ctx.fillStyle = enemy.color;
+                
+                // Полоса здоровья врага
+                if (enemy.health < enemy.maxHealth) {
+                    const healthPercent = enemy.health / enemy.maxHealth;
+                    ctx.fillStyle = '#333';
+                    ctx.fillRect(enemy.x, enemy.y - 10, enemy.width, 5);
+                    ctx.fillStyle = '#ff3300';
+                    ctx.fillRect(enemy.x, enemy.y - 10, enemy.width * healthPercent, 5);
+                }
+            }
+            
+            // Рисование препятствий
+            for (const obstacle of obstacles) {
+                ctx.fillStyle = obstacle.color;
+                ctx.beginPath();
+                ctx.arc(obstacle.x + obstacle.width/2, obstacle.y + obstacle.height/2, 
+                        obstacle.width/2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Детали препятствия
+                ctx.fillStyle = '#444';
+                ctx.beginPath();
+                ctx.arc(obstacle.x + obstacle.width/2, obstacle.y + obstacle.height/2, 
+                        obstacle.width/4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Рисование бонусов
+            for (const powerup of powerups) {
+                ctx.fillStyle = powerup.type === 'health' ? '#00cc00' : '#ff3300';
+                ctx.beginPath();
+                ctx.arc(powerup.x + powerup.width/2, powerup.y + powerup.height/2, 
+                        powerup.width/2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Внутренний символ
+                ctx.fillStyle = '#fff';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(powerup.type === 'health' ? '+' : 'S', 
+                            powerup.x + powerup.width/2, powerup.y + powerup.height/2);
+            }
+            
+            // Рисование частиц
+            for (const particle of particles) {
+                ctx.fillStyle = particle.color;
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        // Главный игровой цикл
+        function gameLoop() {
+            update();
+            draw();
+            if (gameRunning && !gamePaused) {
+                requestAnimationFrame(gameLoop);
+            }
+        }
+        
+        // Начало игры
+        function startGame() {
+            gameRunning = true;
+            gamePaused = false;
+            score = 0;
+            lives = 3;
+            health = 100;
+            level = 1;
+            nextUpgradeScore = 100;
+            bullets = [];
+            enemies = [];
+            particles = [];
+            powerups = [];
+            obstacles = [];
+            player.x = canvas.width / 2 - 25;
+            player.firepower = 1;
+            player.speed = 5;
+            player.shield = 0;
+            player.specialAttack = 0;
+            specialAttackCooldown = 0;
+            specialAttacksUsed = 0;
+            enemiesDestroyed = 0;
+            enemySpawnTimer = 0;
+            obstacleSpawnTimer = 0;
+            enemySpawnInterval = 60;
+            obstacleSpawnInterval = 300;
+            
+            scoreElement.textContent = score;
+            livesElement.textContent = lives;
+            levelElement.textContent = level;
+            healthFill.style.width = '100%';
+            specialAttacksElement.textContent = player.specialAttack;
+            
+            startScreen.style.display = 'none';
+            gameOverScreen.style.display = 'none';
+            upgradeScreen.style.display = 'none';
+            pauseScreen.style.display = 'none';
+            achievementsScreen.style.display = 'none';
+            
+            gameLoop();
+        }
+        
+        // Конец игры
+        function gameOver() {
+            gameRunning = false;
+            finalScoreElement.textContent = score;
+            gameOverScreen.style.display = 'flex';
+            checkAchievements();
+        }
+        
+        // Возврат в главное меню
+        function goToMenu() {
+            gameRunning = false;
+            gamePaused = false;
+            startScreen.style.display = 'flex';
+            gameOverScreen.style.display = 'none';
+            upgradeScreen.style.display = 'none';
+            pauseScreen.style.display = 'none';
+            achievementsScreen.style.display = 'none';
+        }
+        
+        // Обработчики событий
+        window.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+        });
+        
+        window.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+        
+        startButton.addEventListener('click', startGame);
+        restartButton.addEventListener('click', startGame);
+        menuButton.addEventListener('click', goToMenu);
+        menuPauseButton.addEventListener('click', goToMenu);
+        achievementsButton.addEventListener('click', () => {
+            renderAchievements();
+            achievementsScreen.style.display = 'flex';
+        });
+        backButton.addEventListener('click', () => {
+            achievementsScreen.style.display = 'none';
+        });
+        resumeButton.addEventListener('click', togglePause);
+        
+        // Обработчики апгрейдов
+        document.querySelectorAll('.upgrade-option').forEach(option => {
+            option.addEventListener('click', () => {
+                applyUpgrade(option.dataset.upgrade);
+            });
+        });
+        
+        // Инициализация
+        createStars();
+        renderAchievements();
+    </script>
+</body>
+</html>
