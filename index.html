@@ -10,7 +10,6 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
         body {
             background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             height: 100vh;
@@ -21,7 +20,6 @@
             overflow: hidden;
             color: #fff;
         }
-        
         #game-container {
             position: relative;
             width: 800px;
@@ -30,12 +28,10 @@
             border: 2px solid #00eeff;
             overflow: hidden;
         }
-        
         #game-canvas {
             background-color: #000;
             display: block;
         }
-        
         #ui-overlay {
             position: absolute;
             top: 0;
@@ -47,7 +43,6 @@
             pointer-events: none;
             z-index: 5;
         }
-        
         .ui-panel {
             background: rgba(0, 20, 40, 0.7);
             padding: 8px 15px;
@@ -56,7 +51,6 @@
             box-shadow: 0 0 10px rgba(0, 170, 255, 0.5);
             font-size: 16px;
         }
-        
         #start-screen, #game-over, #upgrade-screen, #achievements-screen, #pause-screen {
             position: absolute;
             top: 0;
@@ -70,11 +64,9 @@
             background: rgba(0, 10, 30, 0.9);
             z-index: 10;
         }
-        
         #game-over, #upgrade-screen, #achievements-screen, #pause-screen {
             display: none;
         }
-        
         h1 {
             font-size: 36px;
             margin-bottom: 15px;
@@ -82,14 +74,12 @@
             letter-spacing: 2px;
             text-align: center;
         }
-        
         h2 {
             font-size: 28px;
             margin-bottom: 15px;
             text-shadow: 0 0 10px #ff00aa, 0 0 20px #ff0066;
             text-align: center;
         }
-        
         p {
             font-size: 16px;
             margin: 8px 0;
@@ -97,17 +87,14 @@
             max-width: 80%;
             line-height: 1.5;
         }
-        
         .highlight {
             color: #00eeff;
             font-weight: bold;
         }
-        
         .upgrade-highlight {
             color: #ffcc00;
             font-weight: bold;
         }
-        
         button {
             background: linear-gradient(to bottom, #00aaff, #0066cc);
             color: white;
@@ -121,13 +108,11 @@
             box-shadow: 0 0 15px rgba(0, 170, 255, 0.7);
             transition: all 0.3s;
         }
-        
         button:hover {
             background: linear-gradient(to bottom, #00ccff, #0088ff);
             transform: scale(1.05);
             box-shadow: 0 0 25px rgba(0, 200, 255, 0.9);
         }
-        
         .stars {
             position: absolute;
             top: 0;
@@ -136,13 +121,11 @@
             height: 100%;
             pointer-events: none;
         }
-        
         .star {
             position: absolute;
             background-color: white;
             border-radius: 50%;
         }
-        
         .controls {
             display: flex;
             gap: 15px;
@@ -150,7 +133,6 @@
             flex-wrap: wrap;
             justify-content: center;
         }
-        
         .key {
             background: rgba(0, 50, 100, 0.7);
             border: 2px solid #00aaff;
@@ -161,13 +143,11 @@
             text-align: center;
             font-size: 14px;
         }
-        
         .final-score {
             font-size: 22px;
             margin: 15px 0;
             color: #ffcc00;
         }
-        
         .upgrade-options {
             display: flex;
             gap: 15px;
@@ -175,7 +155,6 @@
             flex-wrap: wrap;
             justify-content: center;
         }
-        
         .upgrade-option {
             background: rgba(0, 30, 60, 0.8);
             border: 2px solid #00aaff;
@@ -186,19 +165,16 @@
             cursor: pointer;
             transition: all 0.3s;
         }
-        
         .upgrade-option:hover {
             background: rgba(0, 60, 120, 0.9);
             transform: translateY(-5px);
             box-shadow: 0 5px 15px rgba(0, 170, 255, 0.5);
         }
-        
         .powerup, .obstacle {
             position: absolute;
             border-radius: 50%;
             z-index: 2;
         }
-        
         .health-bar {
             width: 150px;
             height: 15px;
@@ -208,14 +184,12 @@
             margin-top: 8px;
             overflow: hidden;
         }
-        
         .health-fill {
             height: 100%;
             background: linear-gradient(to right, #ff3300, #00cc00);
             width: 100%;
             transition: width 0.3s;
         }
-        
         .level-indicator {
             position: absolute;
             top: 15px;
@@ -228,7 +202,6 @@
             font-size: 16px;
             z-index: 5;
         }
-        
         .achievements-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -236,7 +209,6 @@
             margin: 20px 0;
             max-width: 90%;
         }
-        
         .achievement {
             background: rgba(0, 30, 60, 0.8);
             border: 2px solid #00aaff;
@@ -245,41 +217,34 @@
             min-width: 180px;
             text-align: center;
         }
-        
         .achievement.unlocked {
             border-color: #ffcc00;
             background: rgba(50, 30, 0, 0.8);
         }
-        
         .achievement-icon {
             font-size: 24px;
             margin-bottom: 8px;
         }
-        
         .achievement-name {
             font-size: 14px;
             font-weight: bold;
             margin-bottom: 5px;
         }
-        
         .achievement-desc {
             font-size: 12px;
             opacity: 0.8;
         }
-        
         .screen-buttons {
             display: flex;
             gap: 15px;
             margin-top: 20px;
         }
-        
         .enemy-health {
             position: absolute;
             width: 100%;
             height: 5px;
             background: #333;
         }
-        
         .enemy-health-fill {
             height: 100%;
             background: #ff3300;
@@ -289,9 +254,7 @@
 <body>
     <div id="game-container">
         <canvas id="game-canvas" width="800" height="600"></canvas>
-        
         <div class="stars" id="stars"></div>
-        
         <div id="ui-overlay">
             <div class="ui-panel">
                 <div>СЧЕТ: <span id="score">0</span></div>
@@ -307,11 +270,9 @@
                 <div>СПЕЦ: <span id="special-attacks">0</span></div>
             </div>
         </div>
-        
         <div id="start-screen">
             <h1>КОСМИЧЕСКИЙ ПОЛЕТ</h1>
             <p>Управляйте своей <span class="highlight">ракетой</span>, уничтожайте врагов и преодолевайте препятствия!</p>
-            
             <div class="controls">
                 <div class="key">← →</div>
                 <div>ДВИЖЕНИЕ</div>
@@ -322,11 +283,9 @@
                 <div class="key">P</div>
                 <div>ПАУЗА</div>
             </div>
-            
             <button id="start-button">НАЧАТЬ ИГРУ</button>
             <button id="achievements-button">ДОСТИЖЕНИЯ</button>
         </div>
-        
         <div id="game-over">
             <h2>ИГРА ОКОНЧЕНА</h2>
             <div class="final-score">Ваш счет: <span id="final-score">0</span></div>
@@ -336,11 +295,9 @@
                 <button id="menu-button">ГЛАВНОЕ МЕНЮ</button>
             </div>
         </div>
-        
         <div id="upgrade-screen">
             <h2>АПГРЕЙД РАКЕТЫ!</h2>
             <p>Выберите улучшение для вашей ракеты:</p>
-            
             <div class="upgrade-options">
                 <div class="upgrade-option" data-upgrade="firepower">
                     <div class="upgrade-icon">🔥</div>
@@ -359,7 +316,6 @@
                 </div>
             </div>
         </div>
-        
         <div id="achievements-screen">
             <h2>ДОСТИЖЕНИЯ</h2>
             <div class="achievements-grid" id="achievements-grid">
@@ -367,7 +323,6 @@
             </div>
             <button id="back-button">НАЗАД</button>
         </div>
-        
         <div id="pause-screen">
             <h2>ПАУЗА</h2>
             <p>Игра приостановлена</p>
@@ -377,7 +332,6 @@
             </div>
         </div>
     </div>
-
     <script>
         // Инициализация canvas
         const canvas = document.getElementById('game-canvas');
@@ -401,10 +355,11 @@
         const healthFill = document.getElementById('health-fill');
         const specialAttacksElement = document.getElementById('special-attacks');
         const achievementsGrid = document.getElementById('achievements-grid');
-        const starsContainer = document.getElementById('stars');
+        const starsContainer = document.getElementById('stars'); // Исправлено: добавлено объявление
         
         // Создание звездного фона
         function createStars() {
+            if (!starsContainer) return; // Исправлено: проверка существования элемента
             starsContainer.innerHTML = '';
             for (let i = 0; i < 150; i++) {
                 const star = document.createElement('div');
@@ -530,12 +485,12 @@
         let obstacleSpawnTimer = 0;
         let obstacleSpawnInterval = 300; // кадры
         
-        // Типы врагов
+        // Типы врагов (исправлено: все враги умирают с одной пули)
         const enemyTypes = [
             { color: '#ff3366', size: 30, speed: 2, points: 10, health: 1 },
-            { color: '#33ccff', size: 40, speed: 1.5, points: 15, health: 2 },
+            { color: '#33ccff', size: 40, speed: 1.5, points: 15, health: 1 },
             { color: '#ffcc00', size: 25, speed: 3, points: 20, health: 1 },
-            { color: '#9933ff', size: 50, speed: 1, points: 30, health: 3 } // Сильный враг
+            { color: '#9933ff', size: 50, speed: 1, points: 30, health: 1 } // Сильный враг
         ];
         
         // Типы препятствий
@@ -656,6 +611,8 @@
         
         // Проверка столкновений
         function checkCollision(obj1, obj2) {
+            // Исправлено: проверка существования объектов
+            if (!obj1 || !obj2) return false;
             return obj1.x < obj2.x + obj2.width &&
                    obj1.x + obj1.width > obj2.x &&
                    obj1.y < obj2.y + obj2.height &&
@@ -741,6 +698,12 @@
             
             // Обновление пуль
             for (let i = bullets.length - 1; i >= 0; i--) {
+                // Исправлено: проверка существования элемента
+                if (!bullets[i]) {
+                    bullets.splice(i, 1);
+                    continue;
+                }
+                
                 if (bullets[i].special) {
                     bullets[i].y += bullets[i].speed;
                 } else {
@@ -756,21 +719,21 @@
                 
                 // Проверка попаданий по врагам
                 for (let j = enemies.length - 1; j >= 0; j--) {
+                    // Исправлено: проверка существования элементов
+                    if (!enemies[j] || !bullets[i]) continue;
+                    
                     if (checkCollision(bullets[i], enemies[j])) {
-                        enemies[j].health -= bullets[i].damage;
+                        // Все враги умирают с одной пули
+                        createExplosion(enemies[j].x + enemies[j].width/2, 
+                                       enemies[j].y + enemies[j].height/2, 
+                                       enemies[j].color);
+                        enemies.splice(j, 1);
+                        score += 10;
+                        enemiesDestroyed++;
+                        scoreElement.textContent = score;
                         
-                        if (enemies[j].health <= 0) {
-                            createExplosion(enemies[j].x + enemies[j].width/2, 
-                                           enemies[j].y + enemies[j].height/2, 
-                                           enemies[j].color);
-                            enemies.splice(j, 1);
-                            score += 10;
-                            enemiesDestroyed++;
-                            scoreElement.textContent = score;
-                            
-                            // Создание бонуса
-                            createPowerup();
-                        }
+                        // Создание бонуса
+                        createPowerup();
                         
                         bullets.splice(i, 1);
                         break;
@@ -779,6 +742,9 @@
                 
                 // Проверка попаданий по препятствиям
                 for (let j = obstacles.length - 1; j >= 0; j--) {
+                    // Исправлено: проверка существования элементов
+                    if (!obstacles[j] || !bullets[i]) continue;
+                    
                     if (checkCollision(bullets[i], obstacles[j])) {
                         // Препятствия нельзя уничтожить, но пуля исчезает
                         bullets.splice(i, 1);
@@ -810,6 +776,12 @@
             
             // Обновление врагов
             for (let i = enemies.length - 1; i >= 0; i--) {
+                // Исправлено: проверка существования элемента
+                if (!enemies[i]) {
+                    enemies.splice(i, 1);
+                    continue;
+                }
+                
                 enemies[i].y += enemies[i].speed;
                 
                 // Удаление врагов за пределами экрана
@@ -848,6 +820,12 @@
             
             // Обновление препятствий
             for (let i = obstacles.length - 1; i >= 0; i--) {
+                // Исправлено: проверка существования элемента
+                if (!obstacles[i]) {
+                    obstacles.splice(i, 1);
+                    continue;
+                }
+                
                 obstacles[i].y += obstacles[i].speed;
                 
                 // Удаление препятствий за пределами экрана
@@ -884,6 +862,12 @@
             
             // Обновление бонусов
             for (let i = powerups.length - 1; i >= 0; i--) {
+                // Исправлено: проверка существования элемента
+                if (!powerups[i]) {
+                    powerups.splice(i, 1);
+                    continue;
+                }
+                
                 powerups[i].y += powerups[i].speed;
                 
                 // Удаление бонусов за пределами экрана
@@ -908,6 +892,12 @@
             
             // Обновление частиц
             for (let i = particles.length - 1; i >= 0; i--) {
+                // Исправлено: проверка существования элемента
+                if (!particles[i]) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+                
                 particles[i].x += Math.cos(particles[i].angle) * particles[i].speed;
                 particles[i].y += Math.sin(particles[i].angle) * particles[i].speed;
                 particles[i].life--;
@@ -986,6 +976,9 @@
             
             // Рисование пуль
             for (const bullet of bullets) {
+                // Исправлено: проверка существования элемента
+                if (!bullet) continue;
+                
                 ctx.fillStyle = bullet.color;
                 ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
                 // Эффект свечения
@@ -996,6 +989,9 @@
             
             // Рисование врагов
             for (const enemy of enemies) {
+                // Исправлено: проверка существования элемента
+                if (!enemy) continue;
+                
                 ctx.fillStyle = enemy.color;
                 ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
                 // Детали врага
@@ -1015,6 +1011,9 @@
             
             // Рисование препятствий
             for (const obstacle of obstacles) {
+                // Исправлено: проверка существования элемента
+                if (!obstacle) continue;
+                
                 ctx.fillStyle = obstacle.color;
                 ctx.beginPath();
                 ctx.arc(obstacle.x + obstacle.width/2, obstacle.y + obstacle.height/2, 
@@ -1031,6 +1030,9 @@
             
             // Рисование бонусов
             for (const powerup of powerups) {
+                // Исправлено: проверка существования элемента
+                if (!powerup) continue;
+                
                 ctx.fillStyle = powerup.type === 'health' ? '#00cc00' : '#ff3300';
                 ctx.beginPath();
                 ctx.arc(powerup.x + powerup.width/2, powerup.y + powerup.height/2, 
@@ -1048,6 +1050,9 @@
             
             // Рисование частиц
             for (const particle of particles) {
+                // Исправлено: проверка существования элемента
+                if (!particle) continue;
+                
                 ctx.fillStyle = particle.color;
                 ctx.beginPath();
                 ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
